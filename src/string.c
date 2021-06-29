@@ -32,7 +32,7 @@ typedef struct mrb_shared_string {
 
 const char mrb_digitmap[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
-#define mrb_obj_alloc_string(mrb) ((struct RString*)mrb_obj_alloc((mrb), MRB_TT_STRING, (mrb)->string_class))
+#define mrb_obj_alloc_string(mrb) MRB_OBJ_ALLOC((mrb), MRB_TT_STRING, (mrb)->string_class)
 
 static struct RString*
 str_init_normal_capa(mrb_state *mrb, struct RString *s,
@@ -2199,7 +2199,7 @@ mrb_str_split_m(mrb_state *mrb, mrb_value str)
   return result;
 }
 
-mrb_value
+static mrb_value
 mrb_str_len_to_inum(mrb_state *mrb, const char *str, size_t len, mrb_int base, int badcheck)
 {
   const char *p = str;
@@ -2363,12 +2363,6 @@ mrb_str_len_to_inum(mrb_state *mrb, const char *str, size_t len, mrb_int base, i
   return mrb_fixnum_value(0);
 }
 
-MRB_API mrb_value
-mrb_cstr_to_inum(mrb_state *mrb, const char *str, mrb_int base, mrb_bool badcheck)
-{
-  return mrb_str_len_to_inum(mrb, str, strlen(str), base, badcheck);
-}
-
 /* obslete: use RSTRING_CSTR() or mrb_string_cstr() */
 MRB_API const char*
 mrb_string_value_cstr(mrb_state *mrb, mrb_value *ptr)
@@ -2439,14 +2433,14 @@ mrb_str_to_i(mrb_state *mrb, mrb_value self)
   mrb_int base = 10;
 
   mrb_get_args(mrb, "|i", &base);
-  if (base < 0) {
+  if (base < 0 || 36 < base) {
     mrb_raisef(mrb, E_ARGUMENT_ERROR, "illegal radix %i", base);
   }
   return mrb_str_to_inum(mrb, self, base, FALSE);
 }
 
 #ifndef MRB_NO_FLOAT
-double
+static double
 mrb_str_len_to_dbl(mrb_state *mrb, const char *s, size_t len, mrb_bool badcheck)
 {
   char buf[DBL_DIG * 4 + 20];
@@ -2533,12 +2527,6 @@ bad:
     if (end<pend) goto bad;
   }
   return d;
-}
-
-MRB_API double
-mrb_cstr_to_dbl(mrb_state *mrb, const char *s, mrb_bool badcheck)
-{
-  return mrb_str_len_to_dbl(mrb, s, strlen(s), badcheck);
 }
 
 MRB_API double

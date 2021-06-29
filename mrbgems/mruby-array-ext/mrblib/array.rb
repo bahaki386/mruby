@@ -386,7 +386,6 @@ class Array
     end
 
     beg = len = 0
-    ary = []
     if block
       if arg0.nil? && arg1.nil? && arg2.nil?
         # ary.fill { |index| block }                    -> ary
@@ -660,7 +659,6 @@ class Array
     return to_enum :keep_if unless block
 
     idx = 0
-    len = self.size
     while idx < self.size do
       if block.call(self[idx])
         idx += 1
@@ -875,7 +873,7 @@ class Array
   #    ary.to_h                ->   Hash
   #    ary.to_h{|item| ... }   ->   Hash
   #
-  # Returns the result of interpreting <i>aray</i> as an array of
+  # Returns the result of interpreting <i>array</i> as an array of
   # <tt>[key, value]</tt> pairs. If a block is given, it should
   # return <tt>[key, value]</tt> pairs to construct a hash.
   #
